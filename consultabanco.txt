@@ -1,0 +1,18 @@
+//Encontra os nomes dos Atores mais velhos e que atuaram no mesmo filme que Tom Hanks 
+
+MATCH (tom:person) -[:ACTED_IN]->()<-[:ACTED_IN](actor:Person) WHERE tom.name="tom Hanks" AND actor.born < tom.born RETURN distinct actor.name AS Name
+
+//Encontra os nomes e a diferença de idade dos Atores mais velhos e que atuaram no mesmo filme que Tom Hanks
+MATCH (tom:person {name:"tom Hanks"}) -[:ACTED_IN]->(movie:Movie), (movie)<-[:acted_in]-(actor:person) WHERE actor.born < tom.born RETURN DISTINCT actor.name AS Name, (tom.born - actor.born) AS diff
+
+//Encontra os nomes dos atores que são diretores e atuaram em filmes nos quais Gene Hackman atuou 
+
+MATCH (gene:person) -[:ACTED_IN]->()<-[:ACTED_IN](other:Person) WHERE gene.name="gene Hackman" AND exists( (other)-[:directed]->() ) RETURN DISTINCT other
+
+//Encontra os nomes dos atores que atuaram em filmes em que o Gene Hackman atuou, mas não quando o Robin Williams estava no filme 
+
+MATCH (gene:person {name:"gene Hackman"}) -[:ACTED_IN]->(movie:Movie), (other:person) -[:ACTED_IN]->(movie), (robin:person {name:"robin Williams"}) WHERE NOT exists( (robin)-[:acted_in]->(movie) ) RETURN DISTINCT other
+
+//Busca por Padrões com caminhos de tamanho variável e devolve todos os pares de nós que estão conectados, mesmo que seja por meio de relacionamentos indiretos de qualquer distância 
+
+MATCH (node1)-[*]-(node2) RETURN node1, node2
